@@ -92,6 +92,16 @@ public User(int id, String username, String role, String password, String email,
 	this.phone = phone;
 	CartId = cartId;
 }
+
+public User(String username, String role, String password, String email,  String phone) {
+	super();
+	this.username = username;
+	this.role = role;
+	this.password = password;
+	this.email = email;
+
+	this.phone = phone;
+}
 public User() {
 	
 }

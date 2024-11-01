@@ -1,9 +1,11 @@
 package servlet;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import dao.UserDAO;
 import daoImpl.UseDAOImpl;
@@ -51,14 +53,31 @@ public class LoginServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		String username = request.getParameter("username");
-		String password = request.getParameter("password");
+
 		 // Thiết lập response là JSON
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
         PrintWriter out = response.getWriter();
-        JsonObject jsonObject = new JsonObject();
-        User user = new User();
+//        JsonObject jsonObject = new JsonObject();
+     // Đọc dữ liệu JSON từ body
+        StringBuilder sb = new StringBuilder();
+        BufferedReader reader = request.getReader();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        String requestBody = sb.toString();
+
+        // Phân tích JSON để lấy username và password
+        JsonObject jsonObject = JsonParser.parseString(requestBody).getAsJsonObject();
+        String username = jsonObject.get("username").getAsString();
+        String password = jsonObject.get("password").getAsString();
+//        String username = request.getParameter("username");
+//        String password = request.getParameter("password");
         boolean check = userDAO.checkLogin(username, password);
         if(check) {
         	String role = userDAO.getRoleUser(username);
@@ -77,5 +96,14 @@ public class LoginServlet extends HttpServlet {
         out.print(jsonObject.toString());
         out.flush();
 	}
+	  @Override
+	    protected void doOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	        // Header CORS cho preflight request
+	        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+	        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+	        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+	        response.setHeader("Access-Control-Allow-Credentials", "true");
+	        response.setStatus(HttpServletResponse.SC_OK);
+	    }
 
 }

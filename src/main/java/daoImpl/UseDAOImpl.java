@@ -23,11 +23,11 @@ public class UseDAOImpl implements UserDAO {
 		return entityManager.createQuery("FROM User").getResultList();
 	}
 	
-	// get role của user theo id
+	// get role của user theo username
 	@Override
 	public String getRoleUser(String username) {
 		try {
-			return entityManager.createQuery("SELECT role FROM User WHERE username = :username").setParameter("username", username).getSingleResult().toString();
+			return entityManager.createQuery("SELECT role FROM User WHERE username = :username",User.class).setParameter("username", username).getSingleResult().toString();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -44,6 +44,9 @@ public class UseDAOImpl implements UserDAO {
             if(user != null) {
                 return true;
             }
+			else {
+				return false;
+			}
         } catch (Exception e) {
             e.printStackTrace();
 		}
@@ -59,5 +62,17 @@ public class UseDAOImpl implements UserDAO {
 		return null;
 	}
 	
+	}
+	@Override
+	public boolean addUser(User user) {
+		try {
+			entityManager.getTransaction().begin();
+			entityManager.persist(user);
+			entityManager.getTransaction().commit();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 }

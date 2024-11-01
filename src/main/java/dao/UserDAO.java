@@ -1,4 +1,5 @@
 package dao;
+//import java.util.List;
 
 import java.util.List;
 
@@ -10,4 +11,6 @@ public interface UserDAO {
 	public String getRoleUser(String username);
 	public boolean checkLogin(String username, String password);
 	public User getUserByUsername(String username);
+	public boolean addUser(User user);
+	
 }	
