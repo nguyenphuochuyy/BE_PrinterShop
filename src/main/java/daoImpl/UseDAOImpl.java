@@ -75,4 +75,25 @@ public class UseDAOImpl implements UserDAO {
 		}
 		return false;
 	}
+	@Override
+	public boolean updateUser(User user) {
+		try {
+			entityManager.getTransaction().begin();
+			entityManager.merge(user);
+			entityManager.getTransaction().commit();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	@Override
+	public User getUserById(int  id) {
+		try {
+			return entityManager.find(User.class, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

@@ -116,7 +116,6 @@ public class UserServlet extends HttpServlet {
         	   	out.print(gson.toJson(jsonObject));
            }
          
-          
         } catch (Exception e) {
 		e.printStackTrace();
 	} finally {
@@ -124,6 +123,59 @@ public class UserServlet extends HttpServlet {
 		out.close();
 	}
   }
+	@Override
+	public void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+		response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+		response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+		response.setHeader("Access-Control-Allow-Credentials", "true");
+		Gson gson = Converters.registerLocalDateTime(new GsonBuilder()).create();
+		PrintWriter out = response.getWriter();
+		JsonObject jsonObject = new JsonObject();
+		try {
+			String pathInfo = request.getPathInfo();
+			if (pathInfo.equals("/update")) {
+				int id = Integer.parseInt(request.getParameter("id"));
+				String username = request.getParameter("username");
+				String password = request.getParameter("password");
+				String role = request.getParameter("role");
+				String email = request.getParameter("email");
+				String phone = request.getParameter("phone");
+				User user = userDAO.getUserById(id);
+				if (user == null) {
+					jsonObject.addProperty("message", "Update fail, user not found");
+					jsonObject.addProperty("status", HttpServletResponse.SC_NOT_FOUND);
+					out.print(gson.toJson(jsonObject));
+					return;
+				}
+				else {
+					user.setUsername(username);
+					user.setPassword(password);
+					user.setRole(role);
+					user.setEmail(email);
+					user.setPhone(phone);
+					boolean isUpdate = userDAO.updateUser(user);
+					if (isUpdate) {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        jsonObject.addProperty("message", "Update user success");
+                        jsonObject.addProperty("status", HttpServletResponse.SC_OK);
+                    } else {
+                        jsonObject.addProperty("message", "Update user fail");
+                        jsonObject.addProperty("status", HttpServletResponse.SC_BAD_REQUEST);
+				}
+
+				out.print(gson.toJson(jsonObject));
+			}
+		}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
 	 @Override
 	    protected void doOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	        // Header CORS cho preflight request
