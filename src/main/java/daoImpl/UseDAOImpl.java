@@ -15,14 +15,14 @@ public class UseDAOImpl implements UserDAO {
 	@Override
 	public void insertUser(User user) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public List<User> getAllUser() {
 		return entityManager.createQuery("FROM User").getResultList();
 	}
-	
+
 	// get role của user theo username
 	@Override
 	public String getRoleUser(String username) {
@@ -50,7 +50,7 @@ public class UseDAOImpl implements UserDAO {
         } catch (Exception e) {
             e.printStackTrace();
 		}
-		
+
 		return false;
 	}
 	@Override
@@ -61,7 +61,7 @@ public class UseDAOImpl implements UserDAO {
             e.printStackTrace();
 		return null;
 	}
-	
+
 	}
 	@Override
 	public boolean addUser(User user) {
@@ -95,5 +95,19 @@ public class UseDAOImpl implements UserDAO {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	@Override
+	public boolean deleteUser(int id) {
+		// TODO Auto-generated method stub
+		try {
+			entityManager.getTransaction().begin();
+			User user = entityManager.find(User.class, id);
+			entityManager.remove(user);
+			entityManager.getTransaction().commit();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 }

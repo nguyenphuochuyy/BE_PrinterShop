@@ -27,12 +27,13 @@ import utils.ManagerFactoryUtils;
 public class UserServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
      private ManagerFactoryUtils managerFactoryUtils;
-	private UserDAO userDAO;  
+	private UserDAO userDAO;
     /**
-     * @throws ServletException 
+     * @throws ServletException
      * @see HttpServlet#HttpServlet()
      */
-    public void  init () throws ServletException {
+    @Override
+	public void  init () throws ServletException {
     	super.init();
     	managerFactoryUtils = new ManagerFactoryUtils();
     	userDAO = new UseDAOImpl(managerFactoryUtils.getEntityManager());
@@ -45,6 +46,7 @@ public class UserServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		   response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
@@ -55,8 +57,7 @@ public class UserServlet extends HttpServlet {
 	       PrintWriter out = response.getWriter();
 	       try {
 				if (pathInfo == null || pathInfo.equals("/")) {
-					System.out.println("PathInfo: " + pathInfo);
-					   	List<User> users = new ArrayList<User>();
+					   	List<User> users = new ArrayList<>();
 						users = userDAO.getAllUser();
 			            users.forEach(user -> user.setCartId(null));
 			            response.setStatus(HttpServletResponse.SC_OK);
@@ -65,7 +66,7 @@ public class UserServlet extends HttpServlet {
 				else if("/role".equals(pathInfo)) {
 					int id = Integer.parseInt(request.getParameter("id"));
 					response.setStatus(HttpServletResponse.SC_OK);
-				
+
 				} else {
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				}
@@ -75,12 +76,13 @@ public class UserServlet extends HttpServlet {
 		}finally {
 			out.flush();
 			out.close();
-		}    
+		}
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
+	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		   response.setContentType("application/json");
 	        response.setCharacterEncoding("UTF-8");
@@ -107,15 +109,15 @@ public class UserServlet extends HttpServlet {
 					response.setStatus(HttpServletResponse.SC_OK);
 					jsonObject.addProperty("message", "Add user success");
 					jsonObject.addProperty("status", HttpServletResponse.SC_CREATED);
-					
+
 				} else {
 					jsonObject.addProperty("message", "Add user fail");
 					jsonObject.addProperty("status", HttpServletResponse.SC_BAD_REQUEST);
-					
+
         	   	}
         	   	out.print(gson.toJson(jsonObject));
            }
-         
+
         } catch (Exception e) {
 		e.printStackTrace();
 	} finally {

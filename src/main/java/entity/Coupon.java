@@ -4,7 +4,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "Coupon")
@@ -14,7 +20,7 @@ public class Coupon {
 	@Column(name = "CouponId")
 	private int id;
 	@Column(name = "CouponCode")
-	private String code; 
+	private String code;
 	@Column(name = "TypeCoupon")
 	private String discount_type;
 	@Column(name = "ValueCoupon")
@@ -107,7 +113,7 @@ public class Coupon {
 		this.usage_count = usage_count;
 		this.carts = carts;
 	}
-	
-	
-	
+
+
+
 }
