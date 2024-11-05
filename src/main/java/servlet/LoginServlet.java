@@ -9,7 +9,6 @@ import com.google.gson.JsonParser;
 
 import dao.UserDAO;
 import daoImpl.UseDAOImpl;
-import entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -21,19 +20,22 @@ import utils.TokenUtil;
 /**
  * Servlet implementation class LoginServlet
  */
-@WebServlet(urlPatterns = {"/api/v1/login"})
+// Cấu hình UrlPattern cho Servlet . Quy ước đặt tên urlPattern theo dạng /api/v1/...
+@WebServlet(urlPatterns = {"/api/v1/login", "/api/v1/login/*"})
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	   private ManagerFactoryUtils managerFactoryUtils;
-		private UserDAO userDAO;     
+		private UserDAO userDAO;
 		private TokenUtil tokenUtil;
     /**
      * @see HttpServlet#HttpServlet()
      */
-		  public void  init () throws ServletException {
+		  @Override
+		public void  init () throws ServletException {
 		    	super.init();
 		    	managerFactoryUtils = new ManagerFactoryUtils();
 		    	userDAO = new UseDAOImpl(managerFactoryUtils.getEntityManager());
+		    	tokenUtil = new TokenUtil();
 		    }
     public LoginServlet() {
         super();
@@ -43,6 +45,7 @@ public class LoginServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
@@ -51,37 +54,41 @@ public class LoginServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
+	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-
 		 // Thiết lập response là JSON
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        response.setHeader("Access-Control-Allow-Credentials", "true");
-        PrintWriter out = response.getWriter();
-//        JsonObject jsonObject = new JsonObject();
+        response.setContentType("application/json"); // Response trả về JSON
+        response.setCharacterEncoding("UTF-8"); // Encoding UTF-8 cho response
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000"); // chấp nhận request từ domain khác localhost:3000
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE"); // Chấp nhận method POST , GET, DELETE
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization"); // Chấp nhận header Authorization
+        response.setHeader("Access-Control-Allow-Credentials", "true"); // chập nhận cookie
+        PrintWriter out = response.getWriter(); // Lấy PrintWriter từ response để ghi dữ liệu vào body của response
+        JsonObject jsonObject = new JsonObject(); // Tạo JsonObject để chứa dữ liệu trả về
      // Đọc dữ liệu JSON từ body
-        StringBuilder sb = new StringBuilder();
-        BufferedReader reader = request.getReader();
-        String line;
+        StringBuilder sb = new StringBuilder(); // Tạo StringBuilder để đọc dữ liệu từ body
+        BufferedReader reader = request.getReader(); // Lấy BufferedReader từ request để đọc dữ liệu từ body
+        String line; // Biến để đọc dữ liệu từng dòng
         while ((line = reader.readLine()) != null) {
-            sb.append(line);
+            sb.append(line); // Đọc dữ liệu từng dòng và thêm vào StringBuilder
         }
-        String requestBody = sb.toString();
-
+        String requestBody = sb.toString(); // Convert StringBuilder sang String
+        // Kiểm tra xem request body có dữ liệu hay không
+		if (requestBody == null || requestBody.isEmpty()) {
+			jsonObject.addProperty("message", "Request body is missing");
+			jsonObject.addProperty("status", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			out.print(jsonObject.toString());
+			out.flush();
+			return;
+		}
         // Phân tích JSON để lấy username và password
-        JsonObject jsonObject = JsonParser.parseString(requestBody).getAsJsonObject();
+        jsonObject = JsonParser.parseString(requestBody).getAsJsonObject();
         String username = jsonObject.get("username").getAsString();
         String password = jsonObject.get("password").getAsString();
-//        String username = request.getParameter("username");
-//        String password = request.getParameter("password");
         boolean check = userDAO.checkLogin(username, password);
         if(check) {
         	String role = userDAO.getRoleUser(username);
-        	String token = tokenUtil.generateToken(username);
+        	String token = TokenUtil.generateToken(username);
         	jsonObject.addProperty("message", "Login success");
         	jsonObject.addProperty("status", 200);
         	jsonObject.addProperty("token", token);
