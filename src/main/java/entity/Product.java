@@ -1,13 +1,22 @@
 package entity;
 
-import jakarta.persistence.*;
+
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "Product")
 public class Product {
-	@Id 
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ProductId")
 	private int id;
@@ -32,8 +41,9 @@ public class Product {
 	@Column(name = "InStock" , columnDefinition = "int")
 	private int inStock;
 	@ManyToOne
-	@JoinColumn(name = "id")
-	private Category categoryId;
+	@JoinColumn(name = "CategoryId")
+	@JsonBackReference // giúp tránh việc lặp vô hạn khi chuyển sang json
+	private Category category;
 	public int getId() {
 		return id;
 	}
@@ -82,14 +92,13 @@ public class Product {
 	public void setInStock(int inStock) {
 		this.inStock = inStock;
 	}
-	public Category getCategoryId() {
-		return categoryId;
+	// vì category là 1 object nên không thể trả về trực tiếp cần phải tạo 1 method để lấy id của category trả về cho client dạng json
+	public Integer getCategoryId() {
+	    return category != null ? category.getId() : null;
 	}
-	public void setCategoryId(Category categoryId) {
-		this.categoryId = categoryId;
-	}
+
 	public Product(int id, String name, double price, String description, String img, String sizePage, int ram,
-			int inStock, Category categoryId) {
+			int inStock, Category category) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -99,8 +108,16 @@ public class Product {
 		this.sizePage = sizePage;
 		this.ram = ram;
 		this.inStock = inStock;
-		this.categoryId = categoryId;
+		this.category = category;
 	}
-	
-	
+	public Category getCategory() {
+		return category;
+	}
+	public void setCategory(Category category) {
+		this.category = category;
+	}
+	public Product() {
+		super();
+	}
+
 }
