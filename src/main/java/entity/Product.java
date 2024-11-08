@@ -3,6 +3,7 @@ package entity;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,6 +44,7 @@ public class Product {
 	@ManyToOne
 	@JoinColumn(name = "CategoryId")
 	@JsonBackReference // giúp tránh việc lặp vô hạn khi chuyển sang json
+//	@JsonIgnore
 	private Category category;
 	public int getId() {
 		return id;

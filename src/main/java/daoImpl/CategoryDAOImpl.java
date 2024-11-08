@@ -18,8 +18,6 @@ public class CategoryDAOImpl implements CategoryDAO {
 		// TODO Auto-generated method stub
 		try {
             return entityManager.createQuery("FROM Category " , Category.class).getResultList();
-
-
         } catch (Exception e) {
             e.printStackTrace();
 
