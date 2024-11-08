@@ -112,6 +112,18 @@ public class Product {
 		this.inStock = inStock;
 		this.category = category;
 	}
+	public Product(String name, double price, String description, String img, String sizePage, int ram, int inStock,
+			Category category) {
+		super();
+		this.name = name;
+		this.price = price;
+		this.description = description;
+		this.img = img;
+		this.sizePage = sizePage;
+		this.ram = ram;
+		this.inStock = inStock;
+		this.category = category;
+	}
 	public Category getCategory() {
 		return category;
 	}

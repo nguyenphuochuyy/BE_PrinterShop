@@ -98,7 +98,7 @@ public class CategoryServlet extends HttpServlet {
 			out.close();
 		}
 	}
-
+	
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
 	 *      response)
@@ -130,22 +130,6 @@ public class CategoryServlet extends HttpServlet {
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				}
 			}
-			else if(pathInfo.equals("/delete")) {
-				// Xóa category theo id
-                int id = Integer.parseInt(request.getParameter("id")); // lấy id từ request
-                boolean deleteCategory = categoryDAO.deleteCategory(id); // gọi hàm xóa category từ categoryDAO và truyền vào id
-                if(!deleteCategory) { // nếu xóa không thành công thì trả về thông báo lỗi
-                    jsonObject.addProperty("message", "Category not found");
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                }
-                else {
-                	// nếu xóa thành công thì trả về thông báo xóa thành công và status code 200
-                        jsonObject.addProperty("message", "Delete category successfully");
-                        jsonObject.addProperty("status", HttpServletResponse.SC_OK);
-                        response.setStatus(HttpServletResponse.SC_OK);
-
-                }
-            }
 			// xử lý khi client gửi request không hợp lệ va trả về status code 400
 			else {
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -207,8 +191,6 @@ public class CategoryServlet extends HttpServlet {
 				}
 
 			}
-
-
 			else {
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			}
@@ -227,6 +209,40 @@ public class CategoryServlet extends HttpServlet {
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+		response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+		response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+		response.setHeader("Access-Control-Allow-Credentials", "true");
+		String pathInfo = request.getPathInfo();
+		Gson gson = Converters.registerLocalDateTime(new GsonBuilder()).create();
+		JsonObject jsonObject = new JsonObject(); // tạo một đối tượng JSON Object để chứa thông tin trả về cho client
+		PrintWriter out = response.getWriter(); // dùng để ghi thông tin trả về cho client
+		try {
+			if(pathInfo.equals("/delete")) {
+				  int id = Integer.parseInt(request.getParameter("id")); // lấy id từ request
+	                boolean deleteCategory = categoryDAO.deleteCategory(id); // gọi hàm xóa category từ categoryDAO và truyền vào id
+	                if(!deleteCategory) { // nếu xóa không thành công thì trả về thông báo lỗi
+	                    jsonObject.addProperty("message", "Category not found");
+	                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+	                }
+	                else {
+	                	// nếu xóa thành công thì trả về thông báo xóa thành công và status code 200
+	                        jsonObject.addProperty("message", "Delete category successfully");
+	                        jsonObject.addProperty("status", HttpServletResponse.SC_OK);
+	                        response.setStatus(HttpServletResponse.SC_OK);
+
+	                }
+			}
+		}catch (Exception e) {
+            e.printStackTrace();
+		}
+		finally {
+			
+			out.flush();
+			out.close();
+		}
 	}
 
 	/**
