@@ -5,6 +5,7 @@ import java.util.List;
 import dao.UserDAO;
 import entity.User;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 
 public class UseDAOImpl implements UserDAO {
 	private EntityManager entityManager;
@@ -110,4 +111,20 @@ public class UseDAOImpl implements UserDAO {
 		}
 		return false;
 	}
+	@Override
+	public boolean checkExitMail(String email) {
+	    try {
+	        User user = (User) entityManager.createQuery("FROM User WHERE email = :email", User.class)
+	                                        .setParameter("email", email)
+	                                        .getSingleResult();
+	        return user != null; // Nếu user không null, email tồn tại
+	    } catch (NoResultException e) {
+	        // Nếu không có kết quả, email không tồn tại
+	        return false;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
+
 }
