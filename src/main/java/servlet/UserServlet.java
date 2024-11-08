@@ -2,9 +2,20 @@ package servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.mail.*;
+import javax.mail.Session;
+import java.util.Properties;
 import com.fatboyindustrial.gsonjavatime.Converters;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -117,6 +128,25 @@ public class UserServlet extends HttpServlet {
         	   	}
         	   	out.print(gson.toJson(jsonObject));
            }
+           
+           if(pathInfo.equals("/signup")) {
+        	   String username = request.getParameter("username");
+        	   String password = request.getParameter("password");
+        	   String email = request.getParameter("email");
+        	   User user = new User(username, password, email);
+        	   if(userDAO.addUser(user))
+        	   {
+        		   jsonObject.addProperty("message", "Signup success");
+        		   jsonObject.addProperty("status", HttpServletResponse.SC_CREATED);
+        		   sendEmail(email);
+        	   }
+				else {
+					jsonObject.addProperty("message", "Signup fail");
+					jsonObject.addProperty("status", HttpServletResponse.SC_BAD_REQUEST);
+				}
+				out.print(gson.toJson(jsonObject));
+				
+           }
 
         } catch (Exception e) {
 		e.printStackTrace();
@@ -186,5 +216,41 @@ public class UserServlet extends HttpServlet {
 	        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 	        response.setHeader("Access-Control-Allow-Credentials", "true");
 	        response.setStatus(HttpServletResponse.SC_OK);
+	    }
+	 
+	 // Hàm gửi email thông báo đăng ký thành công
+	    private void sendEmail(String recipientEmail) throws MessagingException {
+	        String senderEmail = "phuochuynguyen1002@gmail.com";
+	        String senderPassword = "xcfr qwdd quvv qusr";
+	        
+	        // Cấu hình properties cho mail server
+	        Properties properties = new Properties();
+	        properties.put("mail.smtp.host", "smtp.gmail.com"); // SMTP của nhà cung cấp dịch vụ
+	        properties.put("mail.smtp.port", "587"); // Thông thường là 587 cho TLS hoặc 465 cho SSL
+	        properties.put("mail.smtp.auth", "true");
+	        properties.put("mail.smtp.starttls.enable", "true");
+	         
+	        // Tạo authenticator
+	        javax.mail.Authenticator auth = new javax.mail.Authenticator() {
+	        	@Override
+	            protected javax.mail.PasswordAuthentication getPasswordAuthentication() {
+	                return new javax.mail.PasswordAuthentication(senderEmail, senderPassword);
+	            }
+	        };
+	        // Tạo session với authentication
+			Session session = Session.getInstance(properties, auth);
+				
+			
+				
+			
+	        // Tạo thông điệp email
+	        Message message = new MimeMessage(session);
+	        message.setFrom(new InternetAddress(senderEmail));
+	        message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipientEmail));
+	        message.setSubject("Tạo tài khoản thành công từ website printer-shop");
+	        message.setText("Chúc mừng bạn đã tạo tài khoản thành công! Hãy đăng nhập để trải nghiệm dịch vụ tốt nhất từ chúng tôi.");
+
+	        // Gửi email
+	        Transport.send(message);
 	    }
 }
