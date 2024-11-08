@@ -132,20 +132,32 @@ public class UserServlet extends HttpServlet {
            if(pathInfo.equals("/signup")) {
         	   String username = request.getParameter("username");
         	   String password = request.getParameter("password");
-        	   String email = request.getParameter("email");
-        	   User user = new User(username, password, email);
-        	   if(userDAO.addUser(user))
-        	   {
-        		   jsonObject.addProperty("message", "Signup success");
-        		   jsonObject.addProperty("status", HttpServletResponse.SC_CREATED);
-        		   sendEmail(email);
-        	   }
-				else {
-					jsonObject.addProperty("message", "Signup fail");
+        	   String email = request.getParameter("email").trim();
+        	   boolean check = userDAO.checkExitMail(email);
+        
+				if (userDAO.checkExitMail(email)) {
+					jsonObject.addProperty("message", "Email already exists");
 					jsonObject.addProperty("status", HttpServletResponse.SC_BAD_REQUEST);
+					out.print(gson.toJson(jsonObject));
+					return;
 				}
-				out.print(gson.toJson(jsonObject));
-				
+				else {
+					  User user = new User(username, password, email);
+					   if(userDAO.addUser(user))
+		        	   {
+		        		   jsonObject.addProperty("message", "Signup success");
+		        		   jsonObject.addProperty("status", HttpServletResponse.SC_CREATED);
+//		        		   sendEmail(email);
+		        	   }
+						else {
+							jsonObject.addProperty("message", "Signup fail");
+							jsonObject.addProperty("status", HttpServletResponse.SC_BAD_REQUEST);
+						}
+						out.print(gson.toJson(jsonObject));
+						
+				}
+        	 
+        
            }
 
         } catch (Exception e) {
