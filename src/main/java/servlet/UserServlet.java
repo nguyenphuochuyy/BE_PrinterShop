@@ -70,7 +70,6 @@ public class UserServlet extends HttpServlet {
 				if (pathInfo == null || pathInfo.equals("/")) {
 					   	List<User> users = new ArrayList<>();
 						users = userDAO.getAllUser();
-			            users.forEach(user -> user.setCartId(null));
 			            response.setStatus(HttpServletResponse.SC_OK);
 			            out.print(gson.toJson(users));
 				}

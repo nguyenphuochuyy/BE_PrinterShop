@@ -20,11 +20,11 @@ public class Category {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "CategoryId")
 	private int id;
-	@Column(name = "CategoryName")
+	@Column(name = "CategoryName" , columnDefinition = "nvarchar(255)")
 	private String name;
-	@Column(name = "Description")
+	@Column(name = "Description" , columnDefinition = "nvarchar(255)")
 	private String description;
-	@Column(name = "ImgUri")
+	@Column(name = "ImgUri" , columnDefinition = "nvarchar(255)")
 	private String imguri;
 	@OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JsonManagedReference

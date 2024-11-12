@@ -14,7 +14,7 @@ import jakarta.persistence.Table;
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "userId")
+	@Column(name = "UserId")
 	private int id;
 	@Column(name = "UserName", columnDefinition = "nvarchar(255)")
 	private String username;
@@ -33,9 +33,6 @@ public class User {
 
 	@Column(name = "Phone", columnDefinition = "nvarchar(255)")
 	private String phone;
-
-	@OneToMany(mappedBy = "userId")
-	private List<Cart> CartId;
 public int getId() {
 	return id;
 }
@@ -78,14 +75,8 @@ public String getPhone() {
 public void setPhone(String phone) {
 	this.phone = phone;
 }
-public List<Cart> getCartId() {
-	return CartId;
-}
-public void setCartId(List<Cart> cartId) {
-	CartId = cartId;
-}
-public User(int id, String username, String role, String password, String email, String shippingAddress, String phone,
-		List<Cart> cartId) {
+
+public User(int id, String username, String role, String password, String email, String shippingAddress, String phone) {
 	super();
 	this.id = id;
 	this.username = username;
@@ -94,7 +85,7 @@ public User(int id, String username, String role, String password, String email,
 	this.email = email;
 	this.shippingAddress = shippingAddress;
 	this.phone = phone;
-	CartId = cartId;
+
 }
 
 public User(String username, String role, String password, String email,  String phone) {

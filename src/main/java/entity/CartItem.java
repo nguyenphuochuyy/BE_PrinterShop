@@ -17,16 +17,16 @@ public class CartItem {
 	@Column(name = "CartItemId")
 	private int id;
 	@ManyToOne
-	@JoinColumn(name = "CartId")
-	private Cart cartId;
+	@JoinColumn(name = "ProductId" , nullable = false)
+	private Product product;
 	@ManyToOne
-	@JoinColumn(name = "ProductId")
-	private Product productId;
-	@Column(name = "Quantity")
+	@JoinColumn(name = "UserId" , nullable = false)
+	private User user;
+	@Column(name = "Quantity" , columnDefinition = "int")
 	private int quantity;
-	@Column(name = "TotalPrice")
+	@Column(name = "TotalPrice" , columnDefinition = "float")
 	private double totalPrice;
-	@Column(name = "Price")
+	@Column(name = "Price" , columnDefinition = "float")
 	private double price;
 	public int getId() {
 		return id;
@@ -34,17 +34,11 @@ public class CartItem {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public Cart getCartId() {
-		return cartId;
-	}
-	public void setCartId(Cart cartId) {
-		this.cartId = cartId;
-	}
 	public Product getProductId() {
-		return productId;
+		return product;
 	}
 	public void setProductId(Product productId) {
-		this.productId = productId;
+		this.product = productId;
 	}
 	public int getQuantity() {
 		return quantity;
@@ -64,11 +58,10 @@ public class CartItem {
 	public void setPrice(double price) {
 		this.price = price;
 	}
-	public CartItem(int id, Cart cartId, Product productId, int quantity, double totalPrice, double price) {
+	public CartItem(int id, Product productId, int quantity, double totalPrice, double price) {
 		super();
 		this.id = id;
-		this.cartId = cartId;
-		this.productId = productId;
+		this.product = productId;
 		this.quantity = quantity;
 		this.totalPrice = totalPrice;
 		this.price = price;
