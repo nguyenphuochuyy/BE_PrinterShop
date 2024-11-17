@@ -1,7 +1,4 @@
 package entity;
-
-
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -132,6 +129,12 @@ public class Product {
 	}
 	public Product() {
 		super();
+	}
+	@Override
+	public String toString() {
+		return "Product [id=" + id + ", name=" + name + ", price=" + price + ", description=" + description + ", img="
+				+ img + ", sizePage=" + sizePage + ", ram=" + ram + ", inStock=" + inStock + ", category=" + category
+				+ "]";
 	}
 
 }

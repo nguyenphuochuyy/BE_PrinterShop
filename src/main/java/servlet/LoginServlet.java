@@ -66,28 +66,25 @@ public class LoginServlet extends HttpServlet {
         PrintWriter out = response.getWriter(); // Lấy PrintWriter từ response để ghi dữ liệu vào body của response
         JsonObject jsonObject = new JsonObject(); // Tạo JsonObject để chứa dữ liệu trả về
      // Đọc dữ liệu JSON từ body
-//        StringBuilder sb = new StringBuilder(); // Tạo StringBuilder để đọc dữ liệu từ body
-//        BufferedReader reader = request.getReader(); // Lấy BufferedReader từ request để đọc dữ liệu từ body
-//        String line; // Biến để đọc dữ liệu từng dòng
-//        while ((line = reader.readLine()) != null) {
-//            sb.append(line); // Đọc dữ liệu từng dòng và thêm vào StringBuilder
-//        }
-//        String requestBody = sb.toString(); // Convert StringBuilder sang String
-//        // Kiểm tra xem request body có dữ liệu hay không
-//		if (requestBody == null || requestBody.isEmpty()) {
-//			jsonObject.addProperty("message", "Request body is missing");
-//			jsonObject.addProperty("status", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-//			out.print(jsonObject.toString());
-//			out.flush();
-//			return;
-//		}
-        // Lấy username và password từ query parameters
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
+        StringBuilder sb = new StringBuilder(); // Tạo StringBuilder để đọc dữ liệu từ body
+        BufferedReader reader = request.getReader(); // Lấy BufferedReader từ request để đọc dữ liệu từ body
+        String line; // Biến để đọc dữ liệu từng dòng
+        while ((line = reader.readLine()) != null) {
+            sb.append(line); // Đọc dữ liệu từng dòng và thêm vào StringBuilder
+        }
+        String requestBody = sb.toString(); // Convert StringBuilder sang String
+        // Kiểm tra xem request body có dữ liệu hay không
+		if (requestBody == null || requestBody.isEmpty()) {
+			jsonObject.addProperty("message", "Request body is missing");
+			jsonObject.addProperty("status", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			out.print(jsonObject.toString());
+			out.flush();
+			return;
+		}
         // Phân tích JSON để lấy username và password
-//        jsonObject = JsonParser.parseString(requestBody).getAsJsonObject();
-//        String username = jsonObject.get("username").getAsString();
-//        String password = jsonObject.get("password").getAsString();
+        jsonObject = JsonParser.parseString(requestBody).getAsJsonObject();
+        String username = jsonObject.get("username").getAsString();
+        String password = jsonObject.get("password").getAsString();
         boolean check = userDAO.checkLogin(username, password);
         if(check) {
         	String role = userDAO.getRoleUser(username);

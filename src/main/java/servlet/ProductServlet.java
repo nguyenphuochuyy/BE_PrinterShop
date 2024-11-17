@@ -1,5 +1,6 @@
 package servlet;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -65,6 +66,8 @@ public class ProductServlet extends HttpServlet {
 	        String pathInfo = request.getPathInfo();
 	        JsonObject jsonObject = new JsonObject();
 	        ObjectMapper objectMapper = new ObjectMapper(); // Khởi tạo ObjectMapper của Jackson
+	        Gson gson1 = new GsonBuilder().serializeNulls().disableHtmlEscaping().create();
+	        System.out.println("pathInfo: " + pathInfo);
 	        try {
 	 				if (pathInfo == null || pathInfo.equals("/")) {
 	 					   List<Product> products = new ArrayList<>();
@@ -76,25 +79,50 @@ public class ProductServlet extends HttpServlet {
 	 					   else{
 	 						  jsonObject.addProperty("message", "Products found");
 	 		                  jsonObject.addProperty("total", products.size());
+	 		                  // get category name by id of each product in list products then add to json object
+	 		                  
+	 		                  
 	 		                  // dùng ObjectMapper để chuyển đổi object java thành JSON
 	 		                String json = objectMapper.writeValueAsString(products);
 	 		                // dùng gson để chuyển đổi json thành JsonObject
 	 		                jsonObject.add("data", gson.fromJson(json, JsonArray.class));
 	 		                jsonObject.addProperty("status", response.getStatus());
 	 		                  out.println(jsonObject.toString());
-
 	 		               }
 	 				}
 	 				else {
-	 					jsonObject.addProperty("message", "Invalid request");
-	 					jsonObject.addProperty("status", HttpServletResponse.SC_BAD_REQUEST);
-	 					out.println(jsonObject.toString());
-	 				}
+	 		            // Lấy ID sản phẩm từ URL
+	 		            String idParam = pathInfo.substring(1); // Bỏ dấu "/"
+	 		            try {
+	 		            	 String[] pathParts = pathInfo.split("/");
+	 		                int id = Integer.parseInt(pathParts[1]);
+	 		                // Gọi DAO để lấy sản phẩm theo ID
+	 		                Product product = productDAO.getProductById(id);
+	 		                if (product == null) {
+	 		                    jsonObject.addProperty("message", "Sản phẩm không tồn tại");
+	 		                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+	 		                } else {
+	 		                    jsonObject.addProperty("message", "Lấy sản phẩm thành công");
+	 		                       // dùng ObjectMapper để chuyển đổi object java thành JSON
+	 		                    String json = objectMapper.writeValueAsString(product);
+	 		                    // dùng gson để chuyển đổi json thành JsonObject
+	 		                   jsonObject.add("data", gson.fromJson(json, JsonObject.class));	
+	 		                    response.setStatus(HttpServletResponse.SC_OK);
+	 		                   out.println(jsonObject.toString());
+	 		                  
+	 		                }
+	 		            } catch (NumberFormatException e) {
+	 		                jsonObject.addProperty("message", "ID không hợp lệ");
+	 		                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+	 		            }
+	 		        }
+	 				
 			}
 	 		 catch (Exception e) {
 	 			// TODO: handle exception
 	 			e.printStackTrace();
 	 		}finally {
+	 			
 	 			out.flush();
 	 			out.close();
 	 		}
@@ -180,48 +208,47 @@ public class ProductServlet extends HttpServlet {
 		response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 		response.setHeader("Access-Control-Allow-Credentials", "true");
 		String pathInfo = request.getPathInfo();
-		Gson gson = Converters.registerLocalDateTime(new GsonBuilder()).create();
+//		Gson gson = Converters.registerLocalDateTime(new GsonBuilder()).create();
 		JsonObject jsonObject = new JsonObject();
 		PrintWriter out = response.getWriter();
-		try {
-			if (pathInfo == null || pathInfo.equals("/update")) {
-				int id = Integer.parseInt(request.getParameter("id"));
-				String name = request.getParameter("name");
-				String description = request.getParameter("description");
-				String imguri = request.getParameter("imguri");
-				int inStock = Integer.parseInt(request.getParameter("inStock"));
-				double price = Double.parseDouble(request.getParameter("price"));
-				String sizePage = request.getParameter("sizePage");
-				int ram = Integer.parseInt(request.getParameter("ram"));
-				int categoryId = Integer.parseInt(request.getParameter("categoryId"));
-				Product product = productDAO.getProductById(id);
-				if (product != null) {
-					product.setName(name);
-					product.setDescription(description);
-					product.setImg(imguri);
-					product.setInStock(inStock);
-					product.setPrice(price);
-					product.setSizePage(sizePage);
-					product.setRam(ram);
-					Category category = new Category();
-					category.setId(categoryId);
-					product.setCategory(category);
+	    StringBuilder sb = new StringBuilder();
+	    try (BufferedReader reader = request.getReader()) {
+	        String line;
+	        while ((line = reader.readLine()) != null) {
+	            sb.append(line);
+	        }
+	    }
+	    String jsonBody = sb.toString();
+	    Gson gson = new Gson();
+	    Product product = gson.fromJson(jsonBody, Product.class);
+	    Category category = categoryDAO.getCategoryById(product.getCategoryId());
+		if (category == null) {
+			jsonObject.addProperty("message", "Category not found");
+			jsonObject.addProperty("status", HttpServletResponse.SC_NOT_FOUND);
+			out.print(gson.toJson(jsonObject));
+		}
+		product.setCategory(category);
+		try {	
+		
+			if (pathInfo == null || pathInfo.equals("/")) 
+				{
+				 jsonObject.addProperty("message", "Invalid request");
+                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                 out.print(gson.toJson(jsonObject));
+                 return;
 				}
+			
 				boolean updateProduct = productDAO.updateProduct(product);
 				if (updateProduct) {
 					jsonObject.addProperty("message", "Cập nhật sản phẩm thành công");
 					jsonObject.addProperty("status", HttpServletResponse.SC_OK);
-					
 				} else {
 					jsonObject.addProperty("message", "Cập nhật sản phẩm không thành công");
 					jsonObject.addProperty("status", HttpServletResponse.SC_BAD_REQUEST);
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				}
-			} else {
-				jsonObject.addProperty("message", "Yêu cầu không hợp lệ");
-				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			}
-		} catch (Exception e) {
+				}	
+			} 
+		 catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			out.print(gson.toJson(jsonObject));
@@ -243,8 +270,15 @@ public class ProductServlet extends HttpServlet {
         JsonObject jsonObject = new JsonObject();
         PrintWriter out = response.getWriter();
         try {
-            if (pathInfo == null || pathInfo.equals("/delete")) {
-                int id = Integer.parseInt(request.getParameter("id"));
+        	   
+            if (pathInfo == null || pathInfo.equals("/")) {
+            	jsonObject.addProperty("message", "Invalid request");
+            	response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            }
+            else {
+            	
+            	String idParam = pathInfo.substring(1);
+                int id = Integer.parseInt(idParam);
                 boolean deleteProduct = productDAO.deleteProduct(id);
                 if (!deleteProduct) {
                     jsonObject.addProperty("message", "Không tìm thấy sản phẩm !");
@@ -257,9 +291,7 @@ public class ProductServlet extends HttpServlet {
                 }
             } 
             
-            else {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            }
+           
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -268,5 +300,15 @@ public class ProductServlet extends HttpServlet {
             out.close();
         }
     }
+	@Override
+	protected void doOptions(HttpServletRequest request, HttpServletResponse response)
+	        throws ServletException, IOException {
+	    response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+	    response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+	    response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+	    response.setHeader("Access-Control-Allow-Credentials", "true");
+	    response.setStatus(HttpServletResponse.SC_OK);
+	}
+
 	
 }

@@ -28,7 +28,10 @@ public class UseDAOImpl implements UserDAO {
 	@Override
 	public String getRoleUser(String username) {
 		try {
-			return entityManager.createQuery("SELECT role FROM User WHERE username = :username",User.class).setParameter("username", username).getSingleResult().toString();
+			User user = (User) entityManager.createQuery("FROM User WHERE username = :username").setParameter("username", username).getSingleResult();
+			if (user != null) {
+				return user.getRole();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

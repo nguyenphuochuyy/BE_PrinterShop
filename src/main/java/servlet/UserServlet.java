@@ -1,5 +1,6 @@
 package servlet;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Authenticator;
@@ -20,6 +21,7 @@ import com.fatboyindustrial.gsonjavatime.Converters;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import dao.UserDAO;
 import daoImpl.UseDAOImpl;
@@ -129,9 +131,17 @@ public class UserServlet extends HttpServlet {
            }
            
            if(pathInfo.equals("/signup")) {
-        	   String username = request.getParameter("username");
-        	   String password = request.getParameter("password");
-        	   String email = request.getParameter("email").trim();
+        	    StringBuilder sb = new StringBuilder();
+                BufferedReader reader = request.getReader();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+
+                JsonObject jsonRequest = JsonParser.parseString(sb.toString()).getAsJsonObject();
+                String username = jsonRequest.get("username").getAsString();
+                String password = jsonRequest.get("password").getAsString();
+                String email = jsonRequest.get("email").getAsString();
         	   boolean check = userDAO.checkExitMail(email);
         
 				if (userDAO.checkExitMail(email)) {

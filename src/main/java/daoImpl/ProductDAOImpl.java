@@ -25,13 +25,14 @@ public class ProductDAOImpl implements ProductDAO {
 
 	@Override
 	public Product getProductById(int id) {
+		Product product = null;
 		// TODO Auto-generated method stub
 		try {
-            return (Product) entityManager.createQuery("FROM Product WHERE id = :id").setParameter("id", id).getSingleResult();
+            product =  entityManager.find(Product.class, id);
         } catch (Exception e) {
             e.printStackTrace();
         }
-		return null;
+		return product;
 	}
 
 	@Override
@@ -58,6 +59,9 @@ public class ProductDAOImpl implements ProductDAO {
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
+			   if (entityManager.getTransaction().isActive()) {
+		          entityManager.getTransaction().rollback();
+		        }
 		}
 		return false;
 	}
