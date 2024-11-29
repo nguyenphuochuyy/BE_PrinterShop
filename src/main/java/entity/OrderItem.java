@@ -1,5 +1,7 @@
 package entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -10,10 +12,13 @@ public class OrderItem {
 	private int id;
 	@ManyToOne
 	@JoinColumn(name = "ProductId")
-	private Product product;
+	private transient Product product;
+	
 	@ManyToOne
 	@JoinColumn(name = "OrderId")
+	@JsonBackReference // giúp tránh việc lặp vô hạn khi chuyển sang json
 	private Order order;
+	
 	@Column(name = "Quantity")
 	private int quantity;
 	@Column(name = "Price")
@@ -57,6 +62,11 @@ public class OrderItem {
 	}
 	public OrderItem() {
 		super();
+	}
+	@Override
+	public String toString() {
+		return "OrderItem [id=" + id + ", product=" + product + ", order=" + order + ", quantity=" + quantity
+				+ ", price=" + price + "]";
 	}
 	
 	

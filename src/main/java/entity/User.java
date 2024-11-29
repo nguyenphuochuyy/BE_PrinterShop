@@ -2,6 +2,9 @@ package entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,9 +36,27 @@ public class User {
 
 	@Column(name = "Phone", columnDefinition = "nvarchar(255)")
 	private String phone;
+	
+//	
+//	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+//	@JsonBackReference
+//	private List<Order> orders;
+	
+	
 public int getId() {
 	return id;
 }
+
+public User(String username, String role, String password, String email, String shippingAddress, String phone) {
+	super();
+	this.username = username;
+	this.role = role;
+	this.password = password;
+	this.email = email;
+	this.shippingAddress = shippingAddress;
+	this.phone = phone;
+}
+
 public void setId(int id) {
 	this.id = id;
 }
@@ -103,6 +124,12 @@ public User(String username, String password, String email) {
 	this.password = password;
 	this.email = email;
 }
+@Override
+public String toString() {
+	return "User [id=" + id + ", username=" + username + ", role=" + role + ", password=" + password + ", email="
+			+ email + ", shippingAddress=" + shippingAddress + ", phone=" + phone + "]";
+}
+
 public User() {
 
 }

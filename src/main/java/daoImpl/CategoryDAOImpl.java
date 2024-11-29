@@ -68,8 +68,7 @@ public class CategoryDAOImpl implements CategoryDAO {
 			Category category = entityManager.find(Category.class, id);
 			List<Product> products = category.getProducts(); // lấy danh sách product của category đó và set category cuar product đó = null trước khi xóa category
 			for (Product product : products) {
-                product.setCategory
-                (null);
+                product.setCategory(null);
 			}
 			// thực hiện xóa category
 			entityManager.getTransaction().begin();

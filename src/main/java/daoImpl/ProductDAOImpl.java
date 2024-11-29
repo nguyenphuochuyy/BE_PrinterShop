@@ -3,6 +3,7 @@ package daoImpl;
 import java.util.List;
 
 import dao.ProductDAO;
+import entity.Order;
 import entity.Product;
 import jakarta.persistence.EntityManager;
 

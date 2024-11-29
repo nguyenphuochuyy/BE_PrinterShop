@@ -16,4 +16,5 @@ public interface UserDAO {
 	public boolean updateUser(User user);
 	public boolean deleteUser(int id);
 	public boolean checkExitMail(String email);
+	public List<User> searchUser(String search);
 }

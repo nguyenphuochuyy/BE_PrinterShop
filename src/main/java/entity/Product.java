@@ -25,7 +25,7 @@ public class Product {
 	@Column(name = "Price", columnDefinition = "float")
 	private double price;
 
-	@Column(name = "Description", columnDefinition = "nvarchar(255)")
+	@Column(name = "Description", columnDefinition = "nvarchar(3000)")
 	private String description;
 
 	@Column(name = "Img", columnDefinition = "nvarchar(255)")

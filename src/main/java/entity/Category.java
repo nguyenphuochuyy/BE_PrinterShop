@@ -26,7 +26,7 @@ public class Category {
 	private String description;
 	@Column(name = "ImgUri" , columnDefinition = "nvarchar(255)")
 	private String imguri;
-	@OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "category",fetch = FetchType.LAZY)
 	@JsonManagedReference
 	private List<Product> products;
 	public int getId() {
@@ -78,6 +78,12 @@ public class Category {
 	public Category() {
 
 	}
+	@Override
+	public String toString() {
+		return "Category [id=" + id + ", name=" + name + ", description=" + description + ", imguri=" + imguri
+				+  "]";
+	}
+	
 
 
 }

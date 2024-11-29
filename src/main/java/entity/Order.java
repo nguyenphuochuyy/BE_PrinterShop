@@ -1,13 +1,19 @@
  package entity;
 
 import java.time.LocalDate;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.*;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 
@@ -19,7 +25,8 @@ public class Order {
 	@Column(name = "OrderId" , columnDefinition = "int")
 	private int id;
 	@ManyToOne
-	@JoinColumn(name = "UserId")
+	@JoinColumn(name = "UserId" , nullable = true)
+	@JsonManagedReference
 	private User user;
 	@Column(name = "TotalPrice" , columnDefinition = "float")
 	private double totalPrice;
@@ -29,6 +36,33 @@ public class Order {
 	private String shippingAddress;
 	@Column(name = "CreateAt" , columnDefinition = "date")
 	private LocalDate createAt;
+	@Column(name = "PaymentMethod" , columnDefinition = "nvarchar(255)")
+	private String paymentMethod;
+	
+	@OneToMany(mappedBy = "order")
+	@JsonManagedReference
+	private transient  List<OrderItem> orderItems;
+	
+	
+	
+	public User getUser() {
+		return user;
+	}
+	public void setUser(User user) {
+		this.user = user;
+	}
+	public String getPaymentMethod() {
+		return paymentMethod;
+	}
+	public void setPaymentMethod(String paymentMethod) {
+		this.paymentMethod = paymentMethod;
+	}
+	public List<OrderItem> getOrderItems() {
+		return orderItems;
+	}
+	public void setOrderItems(List<OrderItem> orderItems) {
+		this.orderItems = orderItems;
+	}
 	public int getId() {
 		return id;
 	}
@@ -66,16 +100,22 @@ public class Order {
 	public void setCreateAt(LocalDate createAt) {
 		this.createAt = createAt;
 	}
-	public Order(int id, User userId,double totalPrice, String status, String shippingAddress,
-			LocalDate createAt) {
+	
+	public Order( User user, double totalPrice, String status, String shippingAddress, LocalDate createAt,
+			String paymentMethod, List<OrderItem> orderItems) {
 		super();
-		this.id = id;
-		this.user = userId;
+		
+		this.user = user;
 		this.totalPrice = totalPrice;
 		this.status = status;
 		this.shippingAddress = shippingAddress;
 		this.createAt = createAt;
+		this.paymentMethod = paymentMethod;
+		this.orderItems = orderItems;
 	}
-
+	public Order() {
+		super();
+	}
+	
 
 }
